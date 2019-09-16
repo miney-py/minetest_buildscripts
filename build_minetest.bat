@@ -1,13 +1,18 @@
 @echo off
-REM 
-REM Build Minetest 5.1-dev (Master after 5.0 Release, before 5.1 release) with luasocket and lua-cjson.
-REM
-REM Place this file in an empty directory and run it.
-REM
-REM Requirements (tested with): 
-REM Visual Studio Build Tools 2015 or newer
-REM git
-REM cmake
+REM Copyright (C) 2019 Robert Lieback <robertlieback@zetabyte.de>
+
+REM This program is free software; you can redistribute it and/or modify
+REM it under the terms of the GNU Lesser General Public License as published by
+REM the Free Software Foundation; either version 3 of the License, or
+REM (at your option) any later version.
+
+REM This program is distributed in the hope that it will be useful,
+REM but WITHOUT ANY WARRANTY; without even the implied warranty of
+REM MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+REM GNU Lesser General Public License for more details.
+
+REM You should have received a copy of the GNU General Public License
+REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SET ARCH=%1
 
