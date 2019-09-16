@@ -9,17 +9,27 @@ REM Visual Studio Build Tools 2015 or newer
 REM git
 REM cmake
 
-SET ARCH=x64
+SET ARCH=%1
 
-echo ###################################
-echo ###################################
-echo Compiling a x86 Minetest with luasocket and lua-cjson
-echo ###################################
-echo ###################################
+IF [%ARCH%]==[x86] GOTO args_checked
+IF [%ARCH%]==[x64] GOTO args_checked
+
+echo Usage: build_minetest.bat ^<x86/x64^> 
+exit /b
+
+:args_checked
+
+echo Build started at %Time%
+echo ****************************************************************
+echo ****************************************************************
+echo Compiling a %ARCH% Minetest with luasocket and lua-cjson
+echo ****************************************************************
+echo ****************************************************************
 
 if not exist "%ARCH%\" (
   mkdir %ARCH%
 )
+
 REM We stay in this folder between building steps
 cd %ARCH%
 
@@ -37,6 +47,7 @@ if not exist "vcpkg\" (
   )
 )
 
+
 if not exist "vcpkg\buildtrees\freetype\%ARCH%-windows-rel\" (
   cd vcpkg
   echo -----------------------------------
@@ -47,6 +58,7 @@ if not exist "vcpkg\buildtrees\freetype\%ARCH%-windows-rel\" (
   vcpkg install irrlicht zlib curl[winssl] openal-soft libvorbis libogg sqlite3 freetype luajit --triplet %ARCH%-windows
   cd ..
 )
+echo %Time%
 
 if not exist "minetest\" (
   echo -----------------------------------
@@ -72,7 +84,7 @@ if not exist "minetest\bin\Release\minetest.exe" (
     cmake . -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=%~dp0/%ARCH%/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
   )
   cmake --build . --config Release
-  
+  echo %Time%
   cd ..
 )
 
@@ -117,6 +129,7 @@ if not exist "luarocks\systree\lib\lua\5.1\cjson.dll" (
   cd luarocks
   call luarocks.bat install luasocket
   call luarocks.bat install lua-cjson
+  echo %Time%
   cd ..
 )
 
@@ -149,6 +162,7 @@ if not exist "minetest_%ARCH%\" (
   robocopy luarocks\systree\lib\lua\5.1 minetest_%ARCH%\bin /e
   mkdir minetest_%ARCH%\bin\lua
   robocopy luarocks\systree\share\lua\5.1 minetest_%ARCH%\bin\lua /e
+  copy minetest\LICENSE.txt minetest_%ARCH%\
 )
 
 echo ###################################
@@ -156,3 +170,4 @@ echo ###################################
 echo Compilation done. It's all in %~dp0%ARCH%\minetest_%ARCH%
 echo ###################################
 echo ###################################
+echo Build finished at %Time%
