@@ -24,12 +24,25 @@ exit /b
 
 :args_checked
 
+SET STARTTIME=%Time%
 echo Build started at %Time%
 echo ****************************************************************
 echo ****************************************************************
 echo Compiling a %ARCH% Minetest with luasocket and lua-cjson
 echo ****************************************************************
 echo ****************************************************************
+
+if not exist "%~dp0build\" (
+  mkdir %~dp0build
+)
+
+cd %~dp0build
+
+if not exist "%~dp0build\minetest\" (
+  mkdir %~dp0build\minetest
+)
+
+cd minetest
 
 if not exist "%ARCH%\" (
   mkdir %ARCH%
@@ -38,30 +51,31 @@ if not exist "%ARCH%\" (
 REM We stay in this folder between building steps
 cd %ARCH%
 
-if not exist "vcpkg\" (
+if not exist "%~dp0build\minetest\vcpkg\" (
   echo -----------------------------------
   echo -----------------------------------
   echo Download vcpkg from github
   echo -----------------------------------
   echo -----------------------------------
-  git clone https://github.com/microsoft/vcpkg.git
-  if not exist "vcpkg.exe" (
-    cd vcpkg
+  mkdir %~dp0build\minetest\vcpkg
+  git clone https://github.com/microsoft/vcpkg.git %~dp0build\minetest\vcpkg
+  if not exist "%~dp0build\minetest\vcpkg\vcpkg.exe" (
+    cd %~dp0build\minetest\vcpkg
     call bootstrap-vcpkg.bat
-    cd ..
+    cd %~dp0build\minetest\%ARCH%
   )
 )
 
 
-if not exist "vcpkg\buildtrees\freetype\%ARCH%-windows-rel\" (
-  cd vcpkg
+if not exist "%~dp0build\minetest\vcpkg\buildtrees\freetype\%ARCH%-windows-rel\" (
+  cd %~dp0build\minetest\vcpkg
   echo -----------------------------------
   echo -----------------------------------
   echo Compiling irrlicht zlib curl[winssl] openal-soft libvorbis libogg sqlite3 freetype luajit
   echo -----------------------------------
   echo -----------------------------------
   vcpkg install irrlicht zlib curl[winssl] openal-soft libvorbis libogg sqlite3 freetype luajit --triplet %ARCH%-windows
-  cd ..
+  cd %~dp0build\minetest\%ARCH%
 )
 echo %Time%
 
@@ -83,10 +97,10 @@ if not exist "minetest\bin\Release\minetest.exe" (
   echo -----------------------------------
   echo -----------------------------------
   IF "%ARCH%" == "x86" (
-    cmake . -G"Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=%~dp0/%ARCH%/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
+    cmake . -G"Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=%~dp0build/minetest/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
   ) 
   IF "%ARCH%" == "x64" (
-    cmake . -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=%~dp0/%ARCH%/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
+    cmake . -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=%~dp0build/minetest/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
   )
   cmake --build . --config Release
   echo %Time%
@@ -112,9 +126,9 @@ if not exist "luarocks\" (
   cd luarocks_src
   git checkout tags/v3.2.1
   
-  call install.bat /P %~dp0\%ARCH%\luarocks /SELFCONTAINED /LUA %~dp0\%ARCH%\vcpkg\buildtrees\luajit\%ARCH%-windows-rel /INC %~dp0\%ARCH%\vcpkg\buildtrees\luajit\src\v2.0.5-970bc12ceb\src /NOADMIN /Q
+  call install.bat /P %~dp0build/minetest/%ARCH%/luarocks /SELFCONTAINED /LUA %~dp0build/minetest/vcpkg/buildtrees/luajit/%ARCH%-windows-rel /INC %~dp0build/minetest/vcpkg/buildtrees/luajit/src/v2.0.5-970bc12ceb/src /NOADMIN /Q
   
-  REM fix vs2017 call
+  REM fix vs2017 call to point to correct architecture
   cd ..\luarocks
   IF "%ARCH%" == "x86" (
     powershell -Command "(gc luarocks.bat) -replace 'vcvarsall', 'vcvars32' | Out-File -encoding ASCII luarocks.bat"
@@ -138,41 +152,46 @@ if not exist "luarocks\systree\lib\lua\5.1\cjson.dll" (
   cd ..
 )
 
-if not exist "minetest_%ARCH%\" (
+if not exist "%~dp0dist" {
+  mkdir "%~dp0dist"
+}
+
+if not exist "%~dp0dist/minetest_%ARCH%\" (
   echo -----------------------------------
   echo -----------------------------------
   echo Move files to minetest_%ARCH%
   echo -----------------------------------
   echo -----------------------------------
   
-  mkdir minetest_%ARCH%
+  mkdir %~dp0dist/minetest_%ARCH%
   
-  robocopy minetest\bin\Release minetest_%ARCH%\bin /e
-  robocopy minetest\builtin minetest_%ARCH%\builtin /e
-  robocopy minetest\client minetest_%ARCH%\client /e
-  robocopy minetest\clientmods minetest_%ARCH%\clientmods /e
-  robocopy minetest\doc minetest_%ARCH%\doc /e
-  robocopy minetest\fonts minetest_%ARCH%\fonts /e
-  robocopy minetest\games minetest_%ARCH%\games /e
-  robocopy minetest\mods minetest_%ARCH%\mods /e
-  robocopy minetest\po minetest_%ARCH%\po /e
-  robocopy minetest\textures minetest_%ARCH%\textures /e
-  del minetest_%ARCH%\bin\minetest.pdb
+  robocopy %~dp0build/minetest/%ARCH%/minetest\bin\Release %~dp0dist/minetest_%ARCH%\bin /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\builtin %~dp0dist/minetest_%ARCH%\builtin /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\client %~dp0dist/minetest_%ARCH%\client /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\clientmods %~dp0dist/minetest_%ARCH%\clientmods /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\doc %~dp0dist/minetest_%ARCH%\doc /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\fonts %~dp0dist/minetest_%ARCH%\fonts /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\games %~dp0dist/minetest_%ARCH%\games /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\mods %~dp0dist/minetest_%ARCH%\mods /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\po %~dp0dist/minetest_%ARCH%\po /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build/minetest/%ARCH%/minetest\textures %~dp0dist/minetest_%ARCH%\textures /e /NFL /NDL /NJH /nc /ns /np
+  del %~dp0dist/minetest_%ARCH%\bin\minetest.pdb
   
-  robocopy minetest_game minetest_%ARCH%\games\minetest_game /e
-  rmdir /S /Q minetest_%ARCH%\games\minetest_game\.git
-  mkdir minetest_%ARCH%\worlds
+  robocopy %~dp0build/minetest/%ARCH%/minetest_game %~dp0dist/minetest_%ARCH%\games\minetest_game /e /NFL /NDL /NJH /nc /ns /np
+  rmdir /S /Q %~dp0dist/minetest_%ARCH%\games\minetest_game\.git
+  mkdir %~dp0dist/minetest_%ARCH%\worlds
   
   REM luarocks
-  robocopy luarocks\systree\lib\lua\5.1 minetest_%ARCH%\bin /e
-  mkdir minetest_%ARCH%\bin\lua
-  robocopy luarocks\systree\share\lua\5.1 minetest_%ARCH%\bin\lua /e
-  copy minetest\LICENSE.txt minetest_%ARCH%\
+  robocopy luarocks\systree\lib\lua\5.1 %~dp0dist/minetest_%ARCH%\bin /e /NFL /NDL /NJH /nc /ns /np
+  mkdir %~dp0dist/minetest_%ARCH%\bin\lua
+  robocopy luarocks\systree\share\lua\5.1 %~dp0dist/minetest_%ARCH%\bin\lua /e /NFL /NDL /NJH /nc /ns /np
+  copy minetest\LICENSE.txt %~dp0dist/minetest_%ARCH%\
 )
 
 echo ###################################
 echo ###################################
-echo Compilation done. It's all in %~dp0%ARCH%\minetest_%ARCH%
+echo Compilation done. It's all in %~dp0dist/minetest_%ARCH%
 echo ###################################
 echo ###################################
+echo Build started at %STARTTIME%
 echo Build finished at %Time%

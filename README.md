@@ -26,7 +26,6 @@ Run: build_<minetest/miney>.bat <x86/x64>
 ## TODOS
 
 - [ ] Release the miney python library, to bundle it
-- [ ] Better folder structure
 
 ## LICENSE
 
