@@ -85,7 +85,10 @@ if not exist "minetest\" (
   echo Download Minetest sources from github
   echo -----------------------------------
   echo -----------------------------------
-  git clone https://github.com/minetest/minetest.git
+  git clone --single-branch --branch stable-5 https://github.com/minetest/minetest.git
+  REM cd minetest
+  REM git checkout stable-5
+  REM cd ..
 )
 
 if not exist "minetest\bin\Release\minetest.exe" (
@@ -97,10 +100,10 @@ if not exist "minetest\bin\Release\minetest.exe" (
   echo -----------------------------------
   echo -----------------------------------
   IF "%ARCH%" == "x86" (
-    cmake . -G"Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=%~dp0build/minetest/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
+    cmake . -G "Visual Studio 16 2019" -A Win32 -DCMAKE_TOOLCHAIN_FILE=%~dp0build/minetest/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
   ) 
   IF "%ARCH%" == "x64" (
-    cmake . -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=%~dp0build/minetest/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
+    cmake . -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=%~dp0build/minetest/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT=0 -DENABLE_CURSES=0
   )
   cmake --build . --config Release
   echo %Time%
@@ -114,6 +117,9 @@ if not exist "minetest_game\" (
   echo -----------------------------------
   echo -----------------------------------
   git clone https://github.com/minetest/minetest_game.git
+  cd minetest_game
+  git checkout stable-5
+  cd ..
 )
 
 if not exist "luarocks\" (
