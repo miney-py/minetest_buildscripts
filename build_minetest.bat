@@ -158,9 +158,9 @@ if not exist "luarocks\systree\lib\lua\5.1\cjson.dll" (
   cd ..
 )
 
-if not exist "%~dp0dist" {
+if not exist "%~dp0dist" (
   mkdir "%~dp0dist"
-}
+)
 
 if not exist "%~dp0dist/minetest_%ARCH%\" (
   echo -----------------------------------

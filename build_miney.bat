@@ -25,25 +25,24 @@ exit /b
 :args_checked
 
 SET STARTTIME=%Time%
-echo Build started at %Time%
 echo ###################################
 echo ###################################
 echo Bundle minetest %ARCH% with python, miney and mineysocket
 echo ###################################
 echo ###################################
 
-if not exist "dist\minetest_%ARCH%" (
+if not exist "dist/minetest_%ARCH%" (
   echo You need to compile minetest first!
 )
 
-cd dist
 
-
-if not exist "miney_%ARCH%\" (
-  mkdir miney_%ARCH%
+if not exist "miney_%ARCH%/" (
+  mkdir %~dp0dist\miney_%ARCH%
 )
 
-cd miney_%ARCH%
+if not exist "%~dp0build/miney_%ARCH%/" (
+  mkdir %~dp0build\miney_%ARCH%
+)
 
 if not exist "%~dp0dist/miney_%ARCH%/Minetest/" (
   echo -----------------------------------
@@ -54,37 +53,51 @@ if not exist "%~dp0dist/miney_%ARCH%/Minetest/" (
   robocopy %~dp0dist/minetest_%ARCH% %~dp0dist/miney_%ARCH%/Minetest /e /NFL /NDL /NJH /nc /ns /np
 )
 
-if not exist "Minetest\mods\mineysocket\" (
+if not exist "%~dp0dist/miney_%ARCH%/Minetest/mods/mineysocket/" (
   echo -----------------------------------
   echo -----------------------------------
   echo Add mineysocket
   echo -----------------------------------
   echo -----------------------------------
-  cd %~dp0dist/miney_%ARCH%/Minetest/mods
-  git clone git@github.com:miney-py/mineysocket.git
-  cd %~dp0dist/miney_%ARCH%
-  echo secure.trusted_mods = mineysocket >> Minetest\minetest.conf
+
+  cd %~dp0build\miney_%ARCH%
+  if exist "%~dp0build\miney_%ARCH%\mineysocket/" (
+    cd %~dp0build\miney_%ARCH%\mineysocket/
+    git pull
+  )
+  if not exist "%~dp0build\miney_%ARCH%\mineysocket/" (
+    git clone git@github.com:miney-py/mineysocket.git
+    cd %~dp0build\miney_%ARCH%\mineysocket/
+  ) 
+  if not exist "%~dp0dist/miney_%ARCH%/Minetest/mods/mineysocket/" (
+    mkdir %~dp0dist\miney_%ARCH%\Minetest\mods\mineysocket
+  )
+  copy /B LICENSE %~dp0dist\miney_%ARCH%\Minetest\mods\mineysocket\
+  copy /B README.md %~dp0dist\miney_%ARCH%\Minetest\mods\mineysocket\
+  copy /B init.lua %~dp0dist\miney_%ARCH%\Minetest\mods\mineysocket\
+  copy /B mod.conf %~dp0dist\miney_%ARCH%\Minetest\mods\mineysocket\
+  copy /B settingtypes.txt %~dp0dist\miney_%ARCH%\Minetest\mods\mineysocket\
+  
+  echo secure.trusted_mods = mineysocket >> %~dp0dist\miney_%ARCH%\Minetest\minetest.conf
+  
+  cd %~dp0
 )
 
 if not exist "%~dp0dist/miney_%ARCH%/Python/" (
   echo -----------------------------------
   echo -----------------------------------
-  echo Download and extract Python with PIP
+  echo Download and extract Python from webinstaller
   echo -----------------------------------
   echo -----------------------------------
   
   mkdir %~dp0dist\miney_%ARCH%\Python
   
-  if not exist "%~dp0build/miney_%ARCH%/" (
-    mkdir %~dp0build\miney_%ARCH%
-  )
-  
   if not exist "%~dp0build/miney_%ARCH%/python_webinstaller.exe" (
-    IF "%ARCH%" == "x86" (
-      powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.7.4/python-3.7.4-amd64-webinstall.exe -OutFile %~dp0build/miney_%ARCH%/python_webinstaller.exe"
+    IF "%ARCH%"=="x86" (
+      powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.8.1/python-3.8.1-webinstall.exe -OutFile %~dp0build/miney_%ARCH%/python_webinstaller.exe"
     )
-    IF "%ARCH%" == "x64" (
-      powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.7.4/python-3.7.4-webinstall.exe -OutFile %~dp0build/miney_%ARCH%/python_webinstaller.exe"
+    IF "%ARCH%"=="x64" (
+      powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.8.1/python-3.8.1-amd64-webinstall.exe -OutFile %~dp0build/miney_%ARCH%/python_webinstaller.exe"
     )
   )
   if not exist "%~dp0build/miney_%ARCH%/python_tmp/" (
@@ -100,12 +113,57 @@ if not exist "%~dp0dist/miney_%ARCH%/Python/" (
   
   echo cleanup msi's
   del %~dp0dist\miney_%ARCH%\Python\*.msi
-  
-  echo Install pip
-  REM Install PIP
+)
+
+if not exist "%~dp0dist/miney_%ARCH%/Python/Lib/site-packages/pip" (
+  echo -----------------------------------
+  echo -----------------------------------
+  echo Installing pip
+  echo -----------------------------------
+  echo -----------------------------------
+
   powershell -Command "Invoke-WebRequest -Uri https://bootstrap.pypa.io/get-pip.py -OutFile %~dp0build/miney_%ARCH%/python_tmp/get-pip.py"
   %~dp0dist\miney_%ARCH%\Python\python %~dp0build/miney_%ARCH%/python_tmp/get-pip.py
 )
+
+if not exist "%~dp0dist/miney_%ARCH%/Python/Lib/site-packages/miney" (
+  echo -----------------------------------
+  echo -----------------------------------
+  echo Installing miney
+  echo -----------------------------------
+  echo -----------------------------------
+  %~dp0dist\miney_%ARCH%\Python\python -m pip install miney
+)
+
+if not exist "%~dp0dist/miney_%ARCH%/launcher.exe" (
+  echo -----------------------------------
+  echo -----------------------------------
+  echo Installing launcher
+  echo -----------------------------------
+  echo -----------------------------------
+  cd %~dp0build\miney_%ARCH%
+  if exist "%~dp0build\miney_%ARCH%\launcher/" (
+    cd %~dp0build\miney_%ARCH%\launcher\
+    git pull
+  )
+  if not exist "%~dp0build\miney_%ARCH%\launcher/" (
+    git clone https://github.com/miney-py/launcher.git
+    cd %~dp0build\miney_%ARCH%\launcher/
+  )
+  if not exist "%~dp0dist/miney_%ARCH%/Miney/" (
+    mkdir %~dp0dist\miney_%ARCH%\Miney
+  )
+  if not exist "%~dp0dist/miney_%ARCH%/Miney/examples/" (
+    mkdir %~dp0dist\miney_%ARCH%\Miney\examples
+  )
+  copy /B %~dp0build\miney_%ARCH%\launcher\win32\launcher.exe %~dp0dist\miney_%ARCH%\miney_launcher.exe
+  copy /B %~dp0build\miney_%ARCH%\launcher\launcher.py %~dp0dist\miney_%ARCH%\Miney\launcher.py
+  copy /B %~dp0build\miney_%ARCH%\launcher\quickstart.py %~dp0dist\miney_%ARCH%\Miney
+  copy /B %~dp0build\miney_%ARCH%\launcher\LICENSE %~dp0dist\miney_%ARCH%\Miney\LICENSE.txt
+  robocopy %~dp0build\miney_%ARCH%\launcher\res %~dp0dist\miney_%ARCH%\Miney\res /e /NFL /NDL /NJH /nc /ns /np
+)
+
+cd ../..
 
 echo Build started at %STARTTIME%
 echo Build finished at %Time%
