@@ -19,10 +19,6 @@ Place this file in an empty directory and run it.
 
 Run: build_<minetest/miney>.bat <x86/x64>
 
-## TODOS
-
-- [ ] Release the miney python library, to bundle it
-
 ## LICENSE
 
 This program is free software; you can redistribute it and/or modify
