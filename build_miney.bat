@@ -163,7 +163,7 @@ if not exist "%~dp0dist\miney_%ARCH%\miney_launcher.exe" (
   robocopy %~dp0build\miney_%ARCH%\launcher\res %~dp0dist\miney_%ARCH%\Miney\res /e /NFL /NDL /NJH /nc /ns /np
 )
 
-if not exist "%~dp0dist\miney_%ARCH%\Minetest\worlds\miney\" (
+if not exist "%~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\" (
   echo -----------------------------------
   echo -----------------------------------
   echo Creating default world
@@ -173,19 +173,19 @@ if not exist "%~dp0dist\miney_%ARCH%\Minetest\worlds\miney\" (
     mkdir %~dp0dist\miney_%ARCH%\Minetest\worlds
   )
   if not exist "%~dp0dist\miney_%ARCH%\Minetest\worlds\miney\" (
-    mkdir %~dp0dist\miney_%ARCH%\Minetest\worlds\miney
+    mkdir %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney
   )
   
-  echo enable_damage = true >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo creative_mode = false >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo gameid = minetest >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo player_backend = sqlite3 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo backend = sqlite3 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo auth_backend = sqlite3 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo load_mod_mineysocket = true >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
-  echo server_announce = false >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\world.mt
+  echo enable_damage = true >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo creative_mode = false >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo gameid = minetest >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo player_backend = sqlite3 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo backend = sqlite3 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo auth_backend = sqlite3 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo load_mod_mineysocket = true >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
+  echo server_announce = false >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\world.mt
   
-  echo seed = 746036489947438842 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\miney\map_meta.txt
+  echo seed = 746036489947438842 >> %~dp0dist\miney_%ARCH%\Minetest\worlds\Miney\map_meta.txt
 )
 
 cd %~dp0
