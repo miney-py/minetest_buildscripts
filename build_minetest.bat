@@ -58,10 +58,10 @@ if not exist "%~dp0build\minetest\vcpkg\" (
   echo -----------------------------------
   echo -----------------------------------
   mkdir %~dp0build\minetest\vcpkg
-  git clone https://github.com/microsoft/vcpkg.git %~dp0build\minetest\vcpkg
+  git clone --single-branch --branch master https://github.com/microsoft/vcpkg.git %~dp0build\minetest\vcpkg
   if not exist "%~dp0build\minetest\vcpkg\vcpkg.exe" (
     cd %~dp0build\minetest\vcpkg
-    call bootstrap-vcpkg.bat
+    call bootstrap-vcpkg.bat -disableMetrics
     cd %~dp0build\minetest\%ARCH%
   )
 )
@@ -86,9 +86,6 @@ if not exist "minetest\" (
   echo -----------------------------------
   echo -----------------------------------
   git clone --single-branch --branch stable-5 https://github.com/minetest/minetest.git
-  REM cd minetest
-  REM git checkout stable-5
-  REM cd ..
 )
 
 if not exist "minetest\bin\Release\minetest.exe" (
@@ -116,10 +113,8 @@ if not exist "minetest_game\" (
   echo Download Minetest default game
   echo -----------------------------------
   echo -----------------------------------
-  git clone https://github.com/minetest/minetest_game.git
-  cd minetest_game
-  git checkout stable-5
-  cd ..
+  cd %~dp0build\minetest\%ARCH%
+  git clone --single-branch --branch stable-5 https://github.com/minetest/minetest_game.git
 )
 
 if not exist "luarocks\" (
@@ -162,36 +157,36 @@ if not exist "%~dp0dist" (
   mkdir "%~dp0dist"
 )
 
-if not exist "%~dp0dist/minetest_%ARCH%\" (
+if not exist "%~dp0dist\minetest_%ARCH%\" (
   echo -----------------------------------
   echo -----------------------------------
   echo Move files to minetest_%ARCH%
   echo -----------------------------------
   echo -----------------------------------
   
-  mkdir %~dp0dist/minetest_%ARCH%
+  mkdir %~dp0dist\minetest_%ARCH%
   
-  robocopy %~dp0build/minetest/%ARCH%/minetest\bin\Release %~dp0dist/minetest_%ARCH%\bin /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\builtin %~dp0dist/minetest_%ARCH%\builtin /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\client %~dp0dist/minetest_%ARCH%\client /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\clientmods %~dp0dist/minetest_%ARCH%\clientmods /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\doc %~dp0dist/minetest_%ARCH%\doc /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\fonts %~dp0dist/minetest_%ARCH%\fonts /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\games %~dp0dist/minetest_%ARCH%\games /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\mods %~dp0dist/minetest_%ARCH%\mods /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\po %~dp0dist/minetest_%ARCH%\po /e /NFL /NDL /NJH /nc /ns /np
-  robocopy %~dp0build/minetest/%ARCH%/minetest\textures %~dp0dist/minetest_%ARCH%\textures /e /NFL /NDL /NJH /nc /ns /np
-  del %~dp0dist/minetest_%ARCH%\bin\minetest.pdb
+  robocopy %~dp0build\minetest\%ARCH%\minetest\bin\Release %~dp0dist\minetest_%ARCH%\bin /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\builtin %~dp0dist\minetest_%ARCH%\builtin /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\client %~dp0dist\minetest_%ARCH%\client /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\clientmods %~dp0dist\minetest_%ARCH%\clientmods /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\doc %~dp0dist\minetest_%ARCH%\doc /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\fonts %~dp0dist\minetest_%ARCH%\fonts /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\games %~dp0dist\minetest_%ARCH%\games /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\mods %~dp0dist\minetest_%ARCH%\mods /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\po %~dp0dist\minetest_%ARCH%\po /e /NFL /NDL /NJH /nc /ns /np
+  robocopy %~dp0build\minetest\%ARCH%\minetest\textures %~dp0dist\minetest_%ARCH%\textures /e /NFL /NDL /NJH /nc /ns /np
+  del %~dp0dist\minetest_%ARCH%\bin\minetest.pdb
   
-  robocopy %~dp0build/minetest/%ARCH%/minetest_game %~dp0dist/minetest_%ARCH%\games\minetest_game /e /NFL /NDL /NJH /nc /ns /np
-  rmdir /S /Q %~dp0dist/minetest_%ARCH%\games\minetest_game\.git
-  mkdir %~dp0dist/minetest_%ARCH%\worlds
+  robocopy %~dp0build\minetest\%ARCH%\minetest_game %~dp0dist\minetest_%ARCH%\games\minetest_game /e /NFL /NDL /NJH /nc /ns /np
+  rmdir /S /Q %~dp0dist\minetest_%ARCH%\games\minetest_game\.git
+  mkdir %~dp0dist\minetest_%ARCH%\worlds
   
   REM luarocks
-  robocopy luarocks\systree\lib\lua\5.1 %~dp0dist/minetest_%ARCH%\bin /e /NFL /NDL /NJH /nc /ns /np
-  mkdir %~dp0dist/minetest_%ARCH%\bin\lua
-  robocopy luarocks\systree\share\lua\5.1 %~dp0dist/minetest_%ARCH%\bin\lua /e /NFL /NDL /NJH /nc /ns /np
-  copy minetest\LICENSE.txt %~dp0dist/minetest_%ARCH%\
+  robocopy luarocks\systree\lib\lua\5.1 %~dp0dist\minetest_%ARCH%\bin /e /NFL /NDL /NJH /nc /ns /np
+  mkdir %~dp0dist\minetest_%ARCH%\bin\lua
+  robocopy luarocks\systree\share\lua\5.1 %~dp0dist\minetest_%ARCH%\bin\lua /e /NFL /NDL /NJH /nc /ns /np
+  copy minetest\LICENSE.txt %~dp0dist\minetest_%ARCH%\
 )
 
 echo ###################################
