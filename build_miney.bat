@@ -113,6 +113,9 @@ if not exist "%~dp0dist\miney_%ARCH%\Python\" (
   
   echo cleanup msi's
   del %~dp0dist\miney_%ARCH%\Python\*.msi
+  
+  cd %~dp0build\miney_%ARCH%
+  
 )
 
 if not exist "%~dp0dist\miney_%ARCH%\Python\Lib\site-packages\pip\" (
@@ -133,6 +136,12 @@ if not exist "%~dp0dist\miney_%ARCH%\Python\Lib\site-packages\miney" (
   echo -----------------------------------
   echo -----------------------------------
   %~dp0dist\miney_%ARCH%\Python\python -m pip install miney
+  
+  REM Delete all pycache's
+  cd %~dp0dist\miney_%ARCH%\Python
+  FOR /d /r . %%d IN (__pycache__) DO @IF EXIST "%%d" rd /s /q "%%d"
+  
+  cd %~dp0build\miney_%ARCH%
 )
 
 if not exist "%~dp0dist\miney_%ARCH%\miney_launcher.exe" (

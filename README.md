@@ -2,7 +2,7 @@
 
 This build_minetest script downloads all source codes and compiles them to Minetest 5.X (stable-5 branch) extended with luasocket and lua-cjson.
 
-**WARNING: This takes 1h and 2.5 GB on my PC (Intel i5-8250U) per architecture, so double that for x86 and x64!**
+**WARNING: This takes 1h and 2.5 GB on my PC (Intel i5-8250U) per architecture!**
 
 The build_miney script creates a minetest distribution with python and the miney library (*soon*), so you need to build minetest first.  
 Miney is a Minetest distribution, so you need to build minetest first. 
