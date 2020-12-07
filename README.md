@@ -1,3 +1,5 @@
+# DEPRECATED: BUILD WITH https://github.com/miney-py/minetest_windows
+
 # Minetest/Miney Buildscripts
 
 This build_minetest script downloads all source codes and compiles them to Minetest 5.X (stable-5 branch) extended with luasocket and lua-cjson.
