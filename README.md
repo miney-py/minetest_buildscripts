@@ -1,4 +1,4 @@
-# DEPRECATED: BUILD WITH https://github.com/miney-py/minetest_windows
+# DEPRECATED: BUILD WITH https://github.com/miney-py/miney_distribution
 
 # Minetest/Miney Buildscripts
 
